@@ -110,17 +110,17 @@
       const prizeType = urlParams.get("prize");
       const eventName = urlParams.get("event");
 
-      const dataPromise = fetch("测试数据.json").then((response) =>
-        response.json()
-      ).then(data => {
-        data.forEach(user => {
-          const point = user.investment[prizeType] + 1;
-          totalPoints += point
-          pointsList.push(point)
-        })
-        userData = data
-        document.getElementsByClassName("main-btn")[0].disabled = false;
-      });
+      const dataPromise = fetch("测试数据.json")
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((user) => {
+            const point = user.investment[prizeType] + 1;
+            totalPoints += point;
+            pointsList.push(point);
+          });
+          userData = data;
+          document.getElementsByClassName("main-btn")[0].disabled = false;
+        });
 
       function jishi() {
         //输出剩余时间
@@ -207,7 +207,7 @@
           accum_point += pointsList[i];
           if (accum_point > rand_point) return userData[i];
         }
-      }
+      };
 
       // function fabricating a plinko, as a circle included atop the canvas
       const makePlinko = () => {
@@ -337,19 +337,21 @@
       function handleHit(body) {
         const column = Math.floor(body.position.x / columnSize);
         if (typeof hitCache[body.label] === "undefined") {
-          hitCache[body.label] = column;
           console.log(body.label, "hit", column);
           const { name } = JSON.parse(body.label);
-          document.getElementById(
-            "world-event"
-          ).innerText = `${name} 率先到达 ${column} 号位置！`;
-          if (column === Math.min(...Object.values(hitCache))) {
+          if (!Object.values(hitCache).includes(column)) {
+            document.getElementById(
+              "world-event"
+            ).innerText = `${name} 率先到达 ${column} 号位置！`;
+          }
+          if (column < Math.min(...Object.values(hitCache))) {
             document.getElementById(
               "current-winner-text"
             ).innerText = `当前领先：${name}`;
             document.getElementById("current-winner-avatar").src =
               body.render.sprite.texture;
           }
+          hitCache[body.label] = column;
         }
       }
 
