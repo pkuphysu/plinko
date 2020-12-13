@@ -114,10 +114,10 @@
             const width = 800;
             const height = 600;
             // number of columns and rows for the grid of pegs
-            const columns = 20;
-            const rows = 10;
+            const columns = 18;
+            const rows = 7;
             // margin to allocate buckets underneath the grid
-            const margin = 100;
+            const margin = 240;
             // padding to include make space for two rectangles at either side of the canvas
             const padding = width / columns / 2;
             // number of initial and maximum plinkos included in the canvas
@@ -172,7 +172,7 @@
             // function fabricating a bucket, as a white taller-than-wider rectangle positioned at the bottom of the canvas
             const makeBucket = x => {
                 const w = 5;
-                const h = 80;
+                const h = 200;
                 const y = height - h / 2;
 
                 return Bodies.rectangle(x, y, w, h, {
@@ -284,7 +284,7 @@
                         if (existingPlinkos.length > maxPlinkos) {
                             World.remove(world, existingPlinkos[0]);
                         }
-                    }, 300);
+                    }, 200);
                 })
 
             // following a collision event retrieve the label of the two bodies
