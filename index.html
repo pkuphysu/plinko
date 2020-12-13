@@ -45,6 +45,10 @@
         color: purple;
       }
 
+      .main-btn:disabled {
+        background-color: lightslategrey;
+      }
+
       #countt {
         color: white;
         position: absolute;
@@ -82,7 +86,7 @@
 
   <body>
     <div id="demo">
-      <button class="main-btn" onclick="work()" href="#">开始抽奖</button>
+      <button class="main-btn" onclick="work()" disabled>开始抽奖</button>
     </div>
     <div id="info">
       <p id="countt" onclick="restore()"></p>
@@ -96,13 +100,27 @@
     <script id="INLINE_PEN_JS_ID">
       const T = 15; //倒计时时间
       let start; //初始时间
+      let userData = null;
       let hitCache = {};
+      let totalPoints = 0;
+      let pointsList = [];
       let userIdentifier = 0; // Primary key for avatar
       const dropInterval = 150;
+      const urlParams = new URLSearchParams(window.location.search);
+      const prizeType = urlParams.get("prize");
+      const eventName = urlParams.get("event");
 
       const dataPromise = fetch("测试数据.json").then((response) =>
         response.json()
-      );
+      ).then(data => {
+        data.forEach(user => {
+          const point = user.investment[prizeType] + 1;
+          totalPoints += point
+          pointsList.push(point)
+        })
+        userData = data
+        document.getElementsByClassName("main-btn")[0].disabled = false;
+      });
 
       function jishi() {
         //输出剩余时间
@@ -137,7 +155,7 @@
       function restore() {
         document.getElementById("demo").style.display = null;
         document.getElementById("info").style.display = "none";
-        document.getElementById("current-winner-avatar").src = null;
+        document.getElementById("current-winner-avatar").src = "";
         document.getElementById("current-winner-text").innerText = "";
         document.getElementById("world-event").innerText = "";
         hitCache = {};
@@ -182,13 +200,21 @@
       const randomBetween = (min, max) =>
         Math.floor(Math.random() * (max - min)) + min;
 
+      const naiveSelect = () => {
+        let rand_point = Math.floor(Math.random() * totalPoints);
+        let accum_point = 0;
+        for (let i = 0; i < userData.length; i++) {
+          accum_point += pointsList[i];
+          if (accum_point > rand_point) return userData[i];
+        }
+      }
+
       // function fabricating a plinko, as a circle included atop the canvas
-      const makePlinko = async () => {
-        const userData = await dataPromise;
+      const makePlinko = () => {
         const x = randomBetween((width * 6) / 9, (width * 7) / 9);
         const y = randomBetween(0, height / 2) * -1;
         const r = 20;
-        const selectedUser = userData[randomBetween(0, userData.length)];
+        const selectedUser = naiveSelect();
         return Bodies.rectangle(x, y, r, r, {
           restitution: 0.8,
           render: {
@@ -303,8 +329,8 @@
       World.add(world, [...contours, ...pegs, ...buckets]);
 
       // function adding a single plinko, used following a mouse press and at an interval
-      async function addPlinko() {
-        const plinko = await makePlinko();
+      function addPlinko() {
+        const plinko = makePlinko();
         World.add(world, plinko);
       }
 
