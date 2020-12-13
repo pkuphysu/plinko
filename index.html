@@ -16,7 +16,7 @@
             padding: 0;
             margin: 0;
         }
-        
+
         body {
             min-height: 100vh;
             display: flex;
@@ -25,12 +25,12 @@
             align-items: center;
             background: hsl(225, 60%, 15%);
         }
-        
+
         canvas {
             width: 90%;
             max-width: 750px;
         }
-        
+
         a:link {
             color: rgb(255, 255, 255);
             display: block;
@@ -45,7 +45,7 @@
             border-width: 15px;
             font-size: 100px;
         }
-        
+
         a:active {
             background-color: rgb(253, 115, 115);
             border-style: inset;
@@ -286,8 +286,6 @@
                         }
                     }, 300);
                 })
-
-            document.querySelector('body').addEventListener('click', addPlinko);
 
             // following a collision event retrieve the label of the two bodies
             // if one is a plinko, consider its color and apply it to the other body
