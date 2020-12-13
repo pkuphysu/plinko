@@ -51,6 +51,14 @@
             border-style: inset;
             color: purple;
         }
+        
+        #countt {
+            color: white;
+            position: absolute;
+            right: 100px;
+            top: 100px;
+            font-size: 100px;
+        }
     </style>
 </head>
 
@@ -60,11 +68,20 @@
     <p id="countt"></p>
 
     <script src="https://unpkg.com/matter-js@0.14.2/build/matter.min.js"></script>
-    <script>
-        var T = 5; //倒计时时间
+    <script id="INLINE_PEN_JS_ID">
+        const T = 10; //倒计时时间
+
         var start; //初始时间
-        function startfunction() {
+
+        function jishi() { //输出剩余时间
+            var now = new Date();
+            var time = T - (Math.floor(now.getTime() / 1000) - Math.floor(start.getTime() / 1000));
+            document.getElementById("countt").innerHTML = time;
+        }
+
+        function startfunction() { //每秒执行jishi()，T秒后停止
             start = new Date();
+            //jishi();
             var myVar = setInterval(function() {
                 jishi()
             }, 1000);
@@ -73,15 +90,9 @@
             }, T * 1000);
         }
 
-        function jishi() {
-            var now = new Date();
-            var time = T - (Math.floor(now.getTime() / 1000) - Math.floor(start.getTime() / 1000));
-            //var time = 1;
-            document.getElementById("countt").innerHTML = time;
-        }
-    </script>
-    <script id="INLINE_PEN_JS_ID">
         function work() {
+            document.getElementById("countt").innerHTML = T;
+            startfunction();
             var ele = document.getElementById("demo");
             ele.style.display = 'none';
             let avartarData = null;
@@ -277,7 +288,7 @@
                 .then(response => response.json())
                 .then(data => {
                     avartarData = data
-                    setInterval(() => {
+                    setid = setInterval(() => {
                         addPlinko();
                         // as a precaution remove plinkos from world.bodies if the array surpasses a certain threshold
                         const existingPlinkos = world.bodies.filter(body => body.label === 'plinko');
@@ -285,6 +296,9 @@
                             World.remove(world, existingPlinkos[0]);
                         }
                     }, 300);
+                    setTimeout(function() {
+                        clearInterval(setid)
+                    }, T * 1000)
                 })
 
             document.querySelector('body').addEventListener('click', addPlinko);
