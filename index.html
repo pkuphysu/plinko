@@ -8,8 +8,8 @@
   <title>CodePen Demo</title>
 
   <meta name="robots" content="noindex">
-  
-  
+
+
 
   <style class="INLINE_PEN_STYLESHEET_ID">
     * {
@@ -35,11 +35,12 @@ canvas {
 </head>
 
 <body>
-  
-  
-  
+
+
+
 <script src="https://unpkg.com/matter-js@0.14.2/build/matter.min.js"></script>
   <script id="INLINE_PEN_JS_ID">
+let avartarData = null;
     // export the necessary modules
 const { Engine, Render, World, Bodies, Events } = Matter;
 
@@ -87,7 +88,10 @@ const makePlinko = () => {
     restitution: 0.8,
     render: {
       sprite: {
-        texture: `https://avatars0.githubusercontent.com/u/36528777?s=${r}&v=4` } },
+        texture: avartarData[randomBetween(0, avartarData.length)][1],
+        // xScale: 1,
+        // yScale: 1/r
+       } },
 
 
     // add a label to later identify the circle in the collision event
@@ -155,9 +159,11 @@ const contours = [contourBottom, contourLeft, contourRight];
 // plinko
 // an array of plinkos; the idea is to populate with the world immediately with a set number of plinkos
 
-const plinkos = Array(initialPlinkos).
-fill().
-map(() => makePlinko());
+// const plinkos = Array(initialPlinkos).
+// fill().
+// map(() => makePlinko());
+
+const plinkos = []
 
 // pegs
 // array of columns and rows; the idea is to have pegs ranging the width and height of the canvas
@@ -201,14 +207,20 @@ function addPlinko() {
   const plinko = makePlinko();
   World.add(world, plinko);
 }
-const intervalID = setInterval(() => {
-  addPlinko();
-  // as a precaution remove plinkos from world.bodies if the array surpasses a certain threshold
-  const existingPlinkos = world.bodies.filter(body => body.label === 'plinko');
-  if (existingPlinkos.length > maxPlinkos) {
-    World.remove(world, existingPlinkos[0]);
-  }
-}, 300);
+// const intervalID =
+fetch('测试数据.json')
+.then(response => response.json())
+.then(data => {
+  avartarData = data
+  setInterval(() => {
+    addPlinko();
+    // as a precaution remove plinkos from world.bodies if the array surpasses a certain threshold
+    const existingPlinkos = world.bodies.filter(body => body.label === 'plinko');
+    if (existingPlinkos.length > maxPlinkos) {
+      World.remove(world, existingPlinkos[0]);
+    }
+  }, 300);
+})
 
 document.querySelector('body').addEventListener('click', addPlinko);
 
