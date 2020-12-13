@@ -84,13 +84,14 @@
     <div id="demo">
       <button class="main-btn" onclick="work()" href="#">开始抽奖</button>
     </div>
-    <p id="countt"></p>
-    <div class="info-board" id="current-winner">
-      <img id="current-winner-avatar">
-      <span id="current-winner-text"></span>
+    <div id="info">
+      <p id="countt" onclick="restore()"></p>
+      <div class="info-board" id="current-winner">
+        <img id="current-winner-avatar" />
+        <span id="current-winner-text"></span>
+      </div>
+      <div class="info-board" id="world-event"></div>
     </div>
-    <div class="info-board" id="world-event"></div>
-
     <script src="https://unpkg.com/matter-js@0.14.2/build/matter.min.js"></script>
     <script id="INLINE_PEN_JS_ID">
       const T = 15; //倒计时时间
@@ -126,14 +127,20 @@
         }, T * 1000);
 
         document.getElementById("demo").style.display = "none";
-        cleanWorld();
+        document.getElementById("info").style.display = null;
         const setid = setInterval(addPlinko, dropInterval);
         setTimeout(function () {
           clearInterval(setid);
         }, T * 1000);
       }
 
-      function cleanWorld() {
+      function restore() {
+        document.getElementById("demo").style.display = null;
+        document.getElementById("info").style.display = "none";
+        document.getElementById("current-winner-avatar").src = null;
+        document.getElementById("current-winner-text").innerText = "";
+        document.getElementById("world-event").innerText = "";
+        hitCache = {};
         World.remove(
           world,
           world.bodies.filter((body) => body.label.includes("name"))
@@ -314,9 +321,8 @@
             document.getElementById(
               "current-winner-text"
             ).innerText = `当前领先：${name}`;
-            document.getElementById(
-              "current-winner-avatar"
-            ).src = body.render.sprite.texture;
+            document.getElementById("current-winner-avatar").src =
+              body.render.sprite.texture;
           }
         }
       }
