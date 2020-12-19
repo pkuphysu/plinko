@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CodePen Demo</title>
+
+    <meta name="robots" content="noindex" />
+
+    <style class="INLINE_PEN_STYLESHEET_ID">
+      * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        background: hsl(225, 60%, 15%);
+        background-image: url("star.webp");
+        background-size: cover;
+      }
+
+      canvas {
+        width: 90%;
+        max-width: 750px;
+      }
+
+      .main-btn {
+        color: rgb(255, 255, 255);
+        background-color: rgb(255, 0, 0);
+        border-radius: 0px;
+        border-style: outset;
+        border-color: linen;
+        text-decoration: none;
+        border-width: 15px;
+        font-size: 50px;
+        padding: 10px 20px 10px 20px;
+      }
+
+      .main-btn:active {
+        background-color: rgb(253, 115, 115);
+        border-style: inset;
+        color: purple;
+      }
+
+      .main-btn:disabled {
+        background-color: lightslategrey;
+      }
+
+      #countt {
+        color: white;
+        position: absolute;
+        right: 100px;
+        top: 100px;
+        font-size: 100px;
+      }
+
+      .info-board {
+        color: white;
+        position: absolute;
+        left: 100px;
+        font-size: 30px;
+      }
+
+      #world-event {
+        top: 50px;
+      }
+
+      #current-winner {
+        font-size:60px;
+        left: 50%;
+        top: 20px;
+        margin-left: -250px;
+      }
+
+      #demo {
+        text-align: center;
+        position: absolute;
+        height: 100vh;
+        width: 100vw;
+        left: 0;
+        top: 0;
+        background-color: #00000099;
+      }
+
+      #world-event{
+        font-size:30px;
+        left: 100px;
+        top: 70%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="demo">
+      <button class="main-btn" onclick="work()" disabled>开始抽奖</button>
+    </div>
+    <div id="info">
+      <p id="countt" onclick="restore()"></p>
+      <div class="info-board" id="current-winner">
+        <img id="current-winner-avatar" />
+        <div id="current-winner-text"></div>
+      </div>
+      <div class="info-board" id="world-event"></div>
+    </div>
+    <script src="https://unpkg.com/matter-js@0.14.2/build/matter.min.js"></script>
+    <script id="INLINE_PEN_JS_ID">
+      const T = 15; //倒计时时间
+      let start; //初始时间
+      let userData = null;
+      let hitCache = {};
+      let totalPoints = 0;
+      let pointsList = [];
+      let userIdentifier = 0; // Primary key for avatar
+      const dropInterval = 150;
+      const urlParams = new URLSearchParams(window.location.search);
+      const prizeType = urlParams.get("prize");
+      const eventName = urlParams.get("event");
+
+      const dataPromise = fetch("测试数据.json")
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((user) => {
+            const point = user.investment[prizeType] + 1;
+            totalPoints += point;
+            pointsList.push(point);
+          });
+          userData = data;
+          document.getElementsByClassName("main-btn")[0].disabled = false;
+        });
+
+      function jishi() {
+        //输出剩余时间
+        var now = new Date();
+        var time =
+          T -
+          (Math.floor(now.getTime() / 1000) -
+            Math.floor(start.getTime() / 1000));
+        document.getElementById("countt").innerHTML = time;
+      }
+
+      function work() {
+        document.getElementById("countt").innerHTML = T;
+        //每秒执行jishi()，T秒后停止
+        start = new Date();
+        //jishi();
+        var myVar = setInterval(function () {
+          jishi();
+        }, 1000);
+        var stop = setTimeout(function () {
+          clearInterval(myVar);
+        }, T * 1000);
+
+        document.getElementById("demo").style.display = "none";
+        document.getElementById("info").style.display = null;
+        const setid = setInterval(addPlinko, dropInterval);
+        setTimeout(function () {
+          clearInterval(setid);
+        }, T * 1000);
+      }
+
+      function restore() {
+        document.getElementById("demo").style.display = null;
+        document.getElementById("info").style.display = "none";
+        document.getElementById("current-winner-avatar").src = "";
+        document.getElementById("current-winner-text").innerText = "";
+        document.getElementById("world-event").innerText = "";
+        hitCache = {};
+        World.remove(
+          world,
+          world.bodies.filter((body) => body.label.includes("name"))
+        );
+      }
+
+      // export the necessary modules
+      const { Engine, Render, World, Bodies, Events } = Matter;
+
+      // set up the engine
+      const engine = Engine.create();
+
+      // set up the renderer
+      const render = Render.create({
+        element: document.body,
+        engine,
+        // set a background slightly lighter than the body's own background
+        options: {
+          wireframes: false,
+          background: "#00000000",
+        },
+      });
+
+      // global variables used throughout the canvas
+      const width = 800;
+      const height = 600;
+      // number of columns and rows for the grid of pegs
+      const columns = 18;
+      const rows = 7;
+      // margin to allocate buckets underneath the grid
+      const margin = 240;
+      // padding to include make space for two rectangles at either side of the canvas
+      const padding = width / columns / 2;
+      // number of initial and maximum plinkos included in the canvas
+      const initialPlinkos = 10;
+      const maxPlinkos = 250;
+
+      // utility function returning a random integer between two values
+      const randomBetween = (min, max) =>
+        Math.floor(Math.random() * (max - min)) + min;
+
+      const naiveSelect = () => {
+        let rand_point = Math.floor(Math.random() * totalPoints);
+        let accum_point = 0;
+        for (let i = 0; i < userData.length; i++) {
+          accum_point += pointsList[i];
+          if (accum_point > rand_point) return userData[i];
+        }
+      };
+
+      // function fabricating a plinko, as a circle included atop the canvas
+      const makePlinko = () => {
+        const x = randomBetween((width * 6) / 9, (width * 7) / 9);
+        const y = randomBetween(0, height / 2) * -1;
+        const r = 20;
+        const selectedUser = naiveSelect();
+        return Bodies.rectangle(x, y, r, r, {
+          restitution: 0.8,
+          render: {
+            sprite: {
+              texture: selectedUser.avatar,
+            },
+          },
+          // add a label to later identify the circle in the collision event
+          label: JSON.stringify({
+            name: selectedUser.name,
+            id: userIdentifier++,
+          }),
+        });
+      };
+
+      // function fabricating a peg, as a white circle with a static position
+      // accepting as input the coordinates of the circle's center
+      const makePeg = (x, y) => {
+        const r = 5;
+
+        return Bodies.circle(x, y, r, {
+          isStatic: true,
+          render: {
+            fillStyle: "white",
+          },
+          // add a label to later identify the circle in the collision event
+          label: "peg",
+        });
+      };
+
+      // function fabricating a bucket, as a white taller-than-wider rectangle positioned at the bottom of the canvas
+      const makeBucket = (x) => {
+        const w = 5;
+        const h = 200;
+        const y = height - h / 2;
+
+        return Bodies.rectangle(x, y, w, h, {
+          isStatic: true,
+          render: {
+            fillStyle: "white",
+          },
+        });
+      };
+
+      // PLINKO's elements
+      // to prevent the plinkos from bouncing off the canvas's scope, include rectangle elements at the bottom and sides of the element
+      const contourSize = 50;
+      const contourBottom = Bodies.rectangle(
+        width / 2,
+        height + contourSize / 2,
+        width,
+        contourSize,
+        {
+          isStatic: true,
+          label: "bottom",
+        }
+      );
+
+      // use the padding to create the left and right walls as white tall and thin rectangles
+      // the idea is to have them pick up the color of the plinkos coming into contact with the shape
+      const contourLeft = Bodies.rectangle(0, 0, padding / 2, height * 2, {
+        isStatic: true,
+        render: {
+          fillStyle: "white",
+        },
+      });
+
+      const contourRight = Bodies.rectangle(width, 0, padding / 2, height * 2, {
+        isStatic: true,
+        render: {
+          fillStyle: "white",
+        },
+      });
+
+      const contours = [contourBottom, contourLeft, contourRight];
+
+      // pegs
+      // array of columns and rows; the idea is to have pegs ranging the width and height of the canvas
+      // use the padding to reduce the horizontal space allocated to the pegs
+      const columnSize = (width - padding * 2) / columns;
+      const rowSize = (height - margin) / rows;
+      const grid = Array(rows)
+        .fill()
+        .map((rowItem, row) => {
+          // have the number of columns alternate with a shorter row every other row
+          // the idea is to then offset the shorter row to recreate the plinko's own structure
+          const cols = row % 2 === 0 ? columns : columns - 1;
+          const dx = cols !== columns ? columnSize / 2 : 0;
+          return Array(cols)
+            .fill()
+            .map((columnItem, column) => {
+              const x = padding + columnSize * column + columnSize / 2 + dx;
+              const y = rowSize * row + rowSize / 2;
+              return makePeg(x, y);
+            });
+        });
+
+      // since grid refers to a 2d array, flatten the items to a one-dimensional array
+      const pegs = grid.reduce((acc, curr) => [...acc, ...curr], []);
+
+      // buckets
+      // arrays of buckets in which the plinkos would eventually fall
+      // as many buckets as the number of columns -1, to make use of the left and right wall for the outer edges
+      const buckets = Array(columns)
+        .fill()
+        .map((columnItem, column) => {
+          const x = columnSize * column + columnSize;
+          return makeBucket(x);
+        });
+
+      const { world } = engine;
+      World.add(world, [...contours, ...pegs, ...buckets]);
+
+      // function adding a single plinko, used following a mouse press and at an interval
+      function addPlinko() {
+        const plinko = makePlinko();
+        World.add(world, plinko);
+      }
+
+      function handleHit(body) {
+        const column = Math.floor(body.position.x / columnSize);
+        if (typeof hitCache[body.label] === "undefined") {
+          console.log(body.label, "hit", column);
+          const { name } = JSON.parse(body.label);
+          if (!Object.values(hitCache).includes(column)) {
+            document.getElementById(
+              "world-event"
+            ).innerText = `${name} 率先到达 ${column} 号位置！`;
+          }
+          if (column < Math.min(...Object.values(hitCache))) {
+            document.getElementById(
+              "current-winner-text"
+            ).innerText = `当前领先：${name}`;
+            document.getElementById("current-winner-avatar").src =
+              body.render.sprite.texture;
+          }
+          hitCache[body.label] = column;
+        }
+      }
+
+      // following a collision event retrieve the label of the two bodies
+      // if one is a plinko, consider its color and apply it to the other body
+      function handleCollision(event) {
+        const { pairs } = event;
+
+        pairs.forEach((pair) => {
+          const { bodyA, bodyB } = pair;
+          const { label: labelA } = bodyA;
+          const { label: labelB } = bodyB;
+
+          if (labelA !== labelB) {
+            if (labelA === "bottom") handleHit(bodyB);
+            if (labelB === "bottom") handleHit(bodyA);
+          }
+        });
+      }
+      Events.on(engine, "collisionStart", handleCollision);
+
+      // run the engine
+      Engine.run(engine);
+      // run the renderer
+      Render.run(render);
+    </script>
+  </body>
+</html>
