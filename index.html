@@ -94,7 +94,7 @@
 
   <body>
     <div id="demo">
-        <button class="main-btn" onclick="work()" disabled>开始抽奖</button>
+        <button id="button1" class="main-btn" onclick="work()" disabled>开始抽奖</button>
     </div>
     <div id="demo2">
         <img src="reload.png" onclick="restore()"/>
@@ -110,6 +110,7 @@
     </div>
     <script src="https://unpkg.com/matter-js@0.14.2/build/matter.min.js"></script>
     <script id="INLINE_PEN_JS_ID">
+      var a=['一等','二等','三等','四等','五等'];
       const T = 15; //倒计时时间
       let start; //初始时间
       let userData = null;
@@ -120,6 +121,7 @@
       const dropInterval = 150;
       const urlParams = new URLSearchParams(window.location.search);
       const prizeType = urlParams.get("prize");
+      document.getElementById("button1").innerHTML=`抽${a[prizeType-1]}奖`;
       const eventName = urlParams.get("event");
 
       const dataPromise = fetch("https://936f871f7d55.ngrok.io/api/choujiang?event=example_event")
