@@ -2,7 +2,7 @@
 <html lang="en" class="">
   <head>
     <meta charset="UTF-8" />
-    <title>CodePen Demo</title>
+    <title>抽奖</title>
 
     <meta name="robots" content="noindex" />
 
@@ -67,7 +67,9 @@
       }
 
       #world-event {
-        top: 50px;
+        font-size: 20px;
+        left: 30px;
+        top: 100px;
       }
 
       #current-winner {
@@ -87,28 +89,33 @@
         background-color: #00000099;
       }
 
-      #world-event{
-        font-size:30px;
-        left: 100px;
-        top: 70%;
+      #demo2 {
+        position: absolute;
+        right: 100px;
+        bottom: 100px;
       }
     </style>
   </head>
 
   <body>
     <div id="demo">
-      <button class="main-btn" onclick="work()" disabled>开始抽奖</button>
+        <button id="button1" class="main-btn" onclick="work()" disabled>开始抽奖</button>
     </div>
+    <div id="demo2">
+        <img src="reload.png" onclick="restore()"/>
+    </div>
+
     <div id="info">
       <p id="countt" onclick="restore()"></p>
       <div class="info-board" id="current-winner">
         <img id="current-winner-avatar" />
-        <div id="current-winner-text"></div>
-      </div>
-      <div class="info-board" id="world-event"></div>
+        <span id="current-winner-text"></span>
+    </div>
+    <div class="info-board" id="world-event"></div>
     </div>
     <script src="https://unpkg.com/matter-js@0.14.2/build/matter.min.js"></script>
     <script id="INLINE_PEN_JS_ID">
+      var a=['一等','二等','三等','四等','五等'];
       const T = 15; //倒计时时间
       let start; //初始时间
       let userData = null;
@@ -119,9 +126,11 @@
       const dropInterval = 150;
       const urlParams = new URLSearchParams(window.location.search);
       const prizeType = urlParams.get("prize");
+      document.getElementById("button1").innerHTML=`抽${a[prizeType]}奖`;
       const eventName = urlParams.get("event");
+      const apiPoint = urlParams.get("api")
 
-      const dataPromise = fetch("测试数据.json")
+      const dataPromise = fetch(apiPoint)
         .then((response) => response.json())
         .then((data) => {
           data.forEach((user) => {
@@ -154,6 +163,9 @@
         var stop = setTimeout(function () {
           clearInterval(myVar);
         }, T * 1000);
+        var again = setInterval(function(){
+          goagain();
+        },T*1000);
 
         document.getElementById("demo").style.display = "none";
         document.getElementById("info").style.display = null;
@@ -174,6 +186,13 @@
           world,
           world.bodies.filter((body) => body.label.includes("name"))
         );
+
+      }
+      function goagain() {
+          document.getElementById("demo3").innerHTML="再来一次";
+          document.getElementById("demo3").style={
+
+          }
       }
 
       // export the necessary modules
@@ -226,10 +245,16 @@
         const y = randomBetween(0, height / 2) * -1;
         const r = 20;
         const selectedUser = naiveSelect();
+
+        document.getElementById(
+              "world-event"
+            ).innerText = `${selectedUser.name} 加入战场 `;
         return Bodies.rectangle(x, y, r, r, {
           restitution: 0.8,
           render: {
             sprite: {
+                xScale:0.435,
+                yScale:0.435,
               texture: selectedUser.avatar,
             },
           },
@@ -351,9 +376,9 @@
           console.log(body.label, "hit", column);
           const { name } = JSON.parse(body.label);
           if (!Object.values(hitCache).includes(column)) {
-            document.getElementById(
+            /*document.getElementById(
               "world-event"
-            ).innerText = `${name} 率先到达 ${column} 号位置！`;
+            ).innerText = `${name} 率先到达 ${column} 号位置！`;*/
           }
           if (column < Math.min(...Object.values(hitCache))) {
             document.getElementById(
