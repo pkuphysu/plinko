@@ -24,12 +24,13 @@
         background-size: cover;
       }
 
-      canvas {
+      /*canvas {
         width: 90%;
         max-width: 750px;
-      }
+      }*/
 
       .main-btn {
+        top: 30px;
         color: rgb(255, 255, 255);
         background-color: rgb(255, 0, 0);
         border-radius: 0px;
@@ -68,7 +69,7 @@
 
       #world-event {
         font-size: 20px;
-        left: 30px;
+        left: 10%;
         top: 100px;
       }
 
@@ -193,6 +194,10 @@
         document.getElementById("demo3").style = {};
       }
 
+      // global variables used throughout the canvas
+      const width = window.innerWidth * 0.8;
+      const height = window.innerHeight* 0.8;
+
       // export the necessary modules
       const { Engine, Render, World, Bodies, Events } = Matter;
 
@@ -207,12 +212,11 @@
         options: {
           wireframes: false,
           background: "#00000000",
+          height,
+          width,
         },
       });
 
-      // global variables used throughout the canvas
-      const width = 800;
-      const height = 600;
       // number of columns and rows for the grid of pegs
       const columns = 18;
       const rows = 7;
