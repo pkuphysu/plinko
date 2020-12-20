@@ -67,11 +67,16 @@
       }
 
       #world-event {
-        top: 70px;
+        font-size: 20px;
+        left: 30px;
+        top: 100px;
       }
 
       #current-winner {
+        font-size:60px;
+        left: 50%;
         top: 20px;
+        margin-left: -250px;
       }
 
       #demo {
@@ -99,7 +104,7 @@
     <div id="demo2">
         <img src="reload.png" onclick="restore()"/>
     </div>
-    
+
     <div id="info">
       <p id="countt" onclick="restore()"></p>
       <div class="info-board" id="current-winner">
@@ -123,8 +128,9 @@
       const prizeType = urlParams.get("prize");
       document.getElementById("button1").innerHTML=`抽${a[prizeType]}奖`;
       const eventName = urlParams.get("event");
+      const apiPoint = urlParams.get("api")
 
-      const dataPromise = fetch(`/physu/test/api/choujiang?event=${eventName}`)
+      const dataPromise = fetch(apiPoint)
         .then((response) => response.json())
         .then((data) => {
           data.forEach((user) => {
@@ -180,12 +186,12 @@
           world,
           world.bodies.filter((body) => body.label.includes("name"))
         );
-        
+
       }
       function goagain() {
           document.getElementById("demo3").innerHTML="再来一次";
           document.getElementById("demo3").style={
-              
+
           }
       }
 
@@ -239,7 +245,7 @@
         const y = randomBetween(0, height / 2) * -1;
         const r = 20;
         const selectedUser = naiveSelect();
-        
+
         document.getElementById(
               "world-event"
             ).innerText = `${selectedUser.name} 加入战场 `;
