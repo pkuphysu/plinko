@@ -71,7 +71,10 @@
       }
 
       #current-winner {
+        font-size:60px;
+        left: 50%;
         top: 20px;
+        margin-left: -250px;
       }
 
       #demo {
@@ -82,6 +85,12 @@
         left: 0;
         top: 0;
         background-color: #00000099;
+      }
+
+      #world-event{
+        font-size:30px;
+        left: 100px;
+        top: 70%;
       }
     </style>
   </head>
@@ -94,7 +103,7 @@
       <p id="countt" onclick="restore()"></p>
       <div class="info-board" id="current-winner">
         <img id="current-winner-avatar" />
-        <span id="current-winner-text"></span>
+        <div id="current-winner-text"></div>
       </div>
       <div class="info-board" id="world-event"></div>
     </div>
