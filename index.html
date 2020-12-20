@@ -24,13 +24,8 @@
         background-size: cover;
       }
 
-      /*canvas {
-        width: 90%;
-        max-width: 750px;
-      }*/
-
       .main-btn {
-        top: 30px;
+        margin-top: 30px;
         color: rgb(255, 255, 255);
         background-color: rgb(255, 0, 0);
         border-radius: 0px;
@@ -55,7 +50,8 @@
       #countt {
         color: white;
         position: absolute;
-        right: 100px;
+        transform: translate(50%, 0);
+        right: 7%;
         top: 100px;
         font-size: 100px;
       }
@@ -69,15 +65,15 @@
 
       #world-event {
         font-size: 20px;
-        left: 10%;
-        top: 100px;
+        left: 5%;
+        top: 5%;
       }
 
       #current-winner {
         font-size: 60px;
         left: 50%;
         top: 20px;
-        margin-left: -250px;
+        transform: translate(-50%, 0);
       }
 
       #demo {
@@ -92,8 +88,9 @@
 
       #demo2 {
         position: absolute;
-        right: 100px;
-        bottom: 100px;
+        right: 7%;
+        transform: translate(50%, 0);
+        bottom: 10%;
       }
     </style>
   </head>
@@ -195,7 +192,7 @@
       }
 
       // global variables used throughout the canvas
-      const width = window.innerWidth * 0.8;
+      const width = window.innerWidth * 0.7;
       const height = window.innerHeight* 0.8;
 
       // export the necessary modules
@@ -218,7 +215,7 @@
       });
 
       // number of columns and rows for the grid of pegs
-      const columns = 18;
+      const columns = Math.floor(width / 50);
       const rows = 7;
       // margin to allocate buckets underneath the grid
       const margin = 240;
@@ -245,7 +242,7 @@
       const makePlinko = () => {
         const x = randomBetween((width * 6) / 9, (width * 7) / 9);
         const y = randomBetween(0, height / 2) * -1;
-        const r = 20;
+        const r = Math.floor(Math.min(width, height) / 30);
         const selectedUser = naiveSelect();
 
         document.getElementById(
@@ -255,8 +252,8 @@
           restitution: 0.8,
           render: {
             sprite: {
-              xScale: 0.435,
-              yScale: 0.435,
+              xScale: r / 46,
+              yScale: r / 46,
               texture: selectedUser.avatar,
             },
           },
