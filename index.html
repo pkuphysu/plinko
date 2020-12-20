@@ -73,7 +73,7 @@
       }
 
       #current-winner {
-        font-size:60px;
+        font-size: 60px;
         left: 50%;
         top: 20px;
         margin-left: -250px;
@@ -99,10 +99,12 @@
 
   <body>
     <div id="demo">
-        <button id="button1" class="main-btn" onclick="work()" disabled>开始抽奖</button>
+      <button id="button1" class="main-btn" onclick="work()" disabled>
+        开始抽奖
+      </button>
     </div>
     <div id="demo2">
-        <img src="reload.png" onclick="restore()"/>
+      <img src="reload.png" onclick="restore()" />
     </div>
 
     <div id="info">
@@ -110,12 +112,12 @@
       <div class="info-board" id="current-winner">
         <img id="current-winner-avatar" />
         <span id="current-winner-text"></span>
-    </div>
-    <div class="info-board" id="world-event"></div>
+      </div>
+      <div class="info-board" id="world-event"></div>
     </div>
     <script src="https://unpkg.com/matter-js@0.14.2/build/matter.min.js"></script>
     <script id="INLINE_PEN_JS_ID">
-      var a=['一等','二等','三等','四等','五等'];
+      var a = ["一等", "二等", "三等", "四等", "五等"];
       const T = 15; //倒计时时间
       let start; //初始时间
       let userData = null;
@@ -126,9 +128,8 @@
       const dropInterval = 150;
       const urlParams = new URLSearchParams(window.location.search);
       const prizeType = urlParams.get("prize");
-      document.getElementById("button1").innerHTML=`抽${a[prizeType]}奖`;
-      const eventName = urlParams.get("event");
-      const apiPoint = urlParams.get("api")
+      document.getElementById("button1").innerHTML = `抽${a[prizeType]}奖`;
+      const apiPoint = urlParams.get("api");
 
       const dataPromise = fetch(apiPoint)
         .then((response) => response.json())
@@ -163,9 +164,9 @@
         var stop = setTimeout(function () {
           clearInterval(myVar);
         }, T * 1000);
-        var again = setInterval(function(){
+        var again = setInterval(function () {
           goagain();
-        },T*1000);
+        }, T * 1000);
 
         document.getElementById("demo").style.display = "none";
         document.getElementById("info").style.display = null;
@@ -186,13 +187,10 @@
           world,
           world.bodies.filter((body) => body.label.includes("name"))
         );
-
       }
       function goagain() {
-          document.getElementById("demo3").innerHTML="再来一次";
-          document.getElementById("demo3").style={
-
-          }
+        document.getElementById("demo3").innerHTML = "再来一次";
+        document.getElementById("demo3").style = {};
       }
 
       // export the necessary modules
@@ -247,14 +245,14 @@
         const selectedUser = naiveSelect();
 
         document.getElementById(
-              "world-event"
-            ).innerText = `${selectedUser.name} 加入战场 `;
+          "world-event"
+        ).innerText = `${selectedUser.name} 加入战场 `;
         return Bodies.rectangle(x, y, r, r, {
           restitution: 0.8,
           render: {
             sprite: {
-                xScale:0.435,
-                yScale:0.435,
+              xScale: 0.435,
+              yScale: 0.435,
               texture: selectedUser.avatar,
             },
           },
