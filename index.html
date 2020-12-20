@@ -162,9 +162,6 @@
         var stop = setTimeout(function () {
           clearInterval(myVar);
         }, T * 1000);
-        var again = setInterval(function () {
-          goagain();
-        }, T * 1000);
 
         document.getElementById("demo").style.display = "none";
         document.getElementById("info").style.display = null;
@@ -185,10 +182,6 @@
           world,
           world.bodies.filter((body) => body.label.includes("name"))
         );
-      }
-      function goagain() {
-        document.getElementById("demo3").innerHTML = "再来一次";
-        document.getElementById("demo3").style = {};
       }
 
       // global variables used throughout the canvas
