@@ -21,7 +21,7 @@ For example:
 http://localhost:8000/?prize=0&api=data.json
 ```
 
-Or just visit https://pkuphysu.github.io/?prize=0&api=data.json
+Or just visit https://pkuphysu.github.io/plinko/?prize=0&api=data.json
 
 ## How to prepare data
 
