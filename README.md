@@ -7,5 +7,7 @@ Code from <https://codepen.io/borntofrappe/pen/QWWwOWO>
 ## How to compose URL
 
 ```
-http://localhost:8000/?prize=0&api=blahblah
+http://localhost:8000/?prize=0&api=data.json
 ```
+
+Or just visit https://pkuphysu.github.io/?prize=0&api=data.json
